@@ -7,7 +7,7 @@ def var(row, col, value):
 def decode_var(variable):
     row = (variable - 1) // 81 + 1
 
-    col = ((variable - 1) % 81) / 9 + 1
+    col = ((variable - 1) % 81) // 9 + 1
 
     value = (variable - 1) % 9 + 1
 
