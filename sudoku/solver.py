@@ -27,7 +27,8 @@ def add_givens(clauses, sudoku, size):
                 ])
 
 # solve using Glucose3
-def solve(sudoku):
+# stats (optional dict) receives: variables, clauses, encoding_time, solver_time
+def solve(sudoku, method="binary", stats=None):
 
     size = len(sudoku)
 
@@ -43,15 +44,11 @@ def solve(sudoku):
     encoding_start = perf_counter()
 
 # build constraints
-    clauses, next_var = build_constraints(size)
+    clauses, next_var = build_constraints(size, method)
 
     add_givens(clauses, sudoku, size)
 
     encoding_time = perf_counter() - encoding_start
-
-    print("Number of variables:", next_var - 1)
-    print("Number of clauses:", len(clauses))
-    print(f"Encoding time: {encoding_time:.6f} seconds")
 
     solver_start = perf_counter()
     solver = Glucose3()
@@ -62,7 +59,13 @@ def solve(sudoku):
     is_satisfiable = solver.solve()
     solver_time = perf_counter() - solver_start
 
-    print(f"Solver time: {solver_time:.6f} seconds")
+    if stats is not None:
+        stats.update(
+            variables=next_var - 1,
+            clauses=len(clauses),
+            encoding_time=encoding_time,
+            solver_time=solver_time,
+        )
 
     if not is_satisfiable:
         solver.delete()
