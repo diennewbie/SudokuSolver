@@ -114,7 +114,7 @@ def solve_gurobi(sudoku, stats = None):
     model.optimize()
     solver_time = perf_counter() - start
     if stats is not None:
-        stats.update(variable=model.NumVars, clauses=model.NumConstrs, encoding_time=encoding_time, solver_time=solver_time)
+        stats.update(variables=model.NumVars, clauses=model.NumConstrs, encoding_time=encoding_time, solver_time=solver_time)
 
     if model.Status != GRB.OPTIMAL:
         return None
@@ -184,8 +184,7 @@ def solve_cplex_cp(sudoku, stats=None):
             cells[(row, col)] = model.integer_var(1, size, f"cell_{row}_{col}")
 
     for unit in get_units(size):
-        for (row, col) in unit:
-            model.add(model.all_diff([cells[(row, col)]]))
+        model.add(model.all_diff([cells[(row, col)] for (row, col) in unit]))
 
     for row in range(size):
         for col in range(size):
